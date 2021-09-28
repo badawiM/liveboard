@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    Hi
+
+    <script>
+
+        function loadStream() {
+            this.source = null;
+            this.start = function () {
+                this.source = new EventSource("/stream/order-summary");
+                this.source.addEventListener("OrdersSummary", function (event) {
+                    // These events are JSON, so parsing.
+                    console.log(event)
+                });
+
+                this.source.onerror = function () {
+                    this.close();
+                };
+            };
+
+            this.stop = function () {
+                this.source.close();
+            };
+        }
+
+        stream = new loadStream();
+
+        /*
+         * Register callbacks for starting and stopping the SSE controller.
+         */
+        window.onload = function () {
+            stream.start();
+        };
+
+        window.onbeforeunload = function () {
+            stream.stop();
+        }
+
+    </script>
+</body>
+</html>
